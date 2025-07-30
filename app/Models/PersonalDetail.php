@@ -50,6 +50,7 @@ class PersonalDetail extends Model
         'scratchcard_serial',
         'scratchcard_upload',
         'passport',
+        'amount',
     ];
 
     public function studentDetail()
@@ -72,69 +73,48 @@ class PersonalDetail extends Model
 
         // Determine the school code using if-else
         if (in_array($program, [
-            "Primary Education Studies (Double Major)",
-            "Early Childhood Care Education (Double Major)"
+            "Science Laboratory Technology",
         ])) {
-            $courseCode = "ED";
+            $courseCode = "SLT";
         } elseif (in_array($program, [
-            "Mathematics / Geography",
-            "Maths / Economics",
-            "Maths / Biology",
-            "Maths / Special Education",
-            "Integrated Sciences (Double Major)",
-            "Biology / Geography",
-            "Maths / Computer Science",
-            "PHE (Double Major)",
-            "Biology / Special Education",
-            "Biology / Inter Science"
+            "Public Administration",
+            // "Maths / Economics",
+
         ])) {
-            $courseCode = "SE";
+            $courseCode = "DPA";
         } elseif (in_array($program, [
-            "Technical Education Double Major",
-            "Electrical / Electronics",
-            "Automobile",
-            "Building",
-            "Wood Work",
-            "Metal Work"
+            "Business Administration",
+            // "Electrical / Electronics",
+
         ])) {
-            $courseCode = "TE";
+            $courseCode = "DBA";
         } elseif (in_array($program, [
-            "Geography / History",
-            "Geography / Economics",
-            "Geography / Social Studies",
-            "History / CRS",
-            "History / Islamic Studies",
-            "Social Studies / Economics",
-            "Social Studies / CRS",
-            "Social Studies / Islamic Studies",
-            "Islamic Studies / Special Education",
-            "Eco / Special Education",
-            "CRS / Special Education",
-            "History / Special Education"
+            "Computer Science",
+            // "Geography / Economics",
         ])) {
-            $courseCode = "AS";
+            $courseCode = "CSC";
         } elseif (in_array($program, [
-            "English / History",
-            "English / CRS",
-            "English / Arabic",
-            "English / Hausa",
-            "English / Social Studies",
-            "English / Islamic Studies",
-            "Hausa / Islamic Studies",
-            "Hausa / Arabic",
-            "Hausa / Social Studies",
-            "Arabic / Islamic Studies",
-            "Arabic / Social Studies",
-            "English / Special Education",
-            "Hausa / Special Education"
+            "Criminology and intelligence Studies",
+            // "English / CRS",
+
         ])) {
-            $courseCode = "LA";
+            $courseCode = "CIS";
         } elseif (in_array($program, [
-            "Agricultural Science Education (Double Major)",
-            "Home Economics (Double Major)",
-            "Business Education (Double Major)"
+            "Library and Information Science",
         ])) {
-            $courseCode = "VE";
+            $courseCode = "LIS";
+        } elseif (in_array($program, [
+            "Media and Communication Studies",
+        ])) {
+            $courseCode = "MCS";
+        } elseif (in_array($program, [
+            "Transport Management and Operations",
+        ])) {
+            $courseCode = "TMO";
+        } elseif (in_array($program, [
+            "Social/Medical works and Rehabilitation Studies",
+        ])) {
+            $courseCode = "CSW";
         }
 
         // Log school code (for debugging)
@@ -142,27 +122,10 @@ class PersonalDetail extends Model
 
         // Determine the centre code
         if ($centre == 'suleja') {
-            $matCentre = 'SU';
-        } elseif ($centre == 'Rijau') {
-            $matCentre = 'RJ'; // Default or other centre code
-        } elseif ($centre == 'Gulu') {
-            $matCentre = 'GL'; // Default or other centre code
-        } elseif ($centre == 'New Bussa') {
-            $matCentre = 'NB'; // Default or other centre code
-        } elseif ($centre == 'Mokwa') {
-            $matCentre = 'MK'; // Default or other centre code
-        } elseif ($centre == 'Kagara') {
-            $matCentre = 'KG'; // Default or other centre code
-        } elseif ($centre == 'Salka') {
-            $matCentre = 'SL'; // Default or other centre code
-        } elseif ($centre == 'Kontogora') {
-            $matCentre = 'KT'; // Default or other centre code
-        } elseif ($centre == 'Katcha') {
-            $matCentre = 'KC'; // Default or other centre code
-        } elseif ($centre == 'Doko') {
-            $matCentre = 'DK'; // Default or other centre code
+            $matCentre = 'SUL';
+        } elseif ($centre == 'Minna') {
+            $matCentre = 'MNA';
         }
-
 
         // Get the last matric number for this program
         $latestStudent = self::where('course', $program)
@@ -171,15 +134,17 @@ class PersonalDetail extends Model
 
         // Extract the sequential part of the latest matric number
         if ($latestStudent) {
-            $lastNumber = (int) substr($latestStudent->matric_number, -5);
+            // Get the last 4 digits instead of 3
+            $lastNumber = (int) substr($latestStudent->matric_number, -4);
         } else {
-            $lastNumber = 10000; // Start from 10001 if no records exist
+            $lastNumber = 0; // Start from 0 so first number will be 0001
         }
 
-        // Generate the new matric number
-        $newNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
-        $year = date('y'); // Get the current year (e.g., 24)
-        $newGenerated = '1' . $newNumber;
-        return "{$matCentre}/{$courseCode}/{$year}/{$newGenerated}";
+        // Generate the new sequential number (4 digits, padded with zeros)
+        $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        $year = date('y'); // Get the current year (e.g., 25)
+
+        // Return the formatted matric number
+        return "D{$year}/{$matCentre}/{$courseCode}/{$newNumber}";
     }
 }

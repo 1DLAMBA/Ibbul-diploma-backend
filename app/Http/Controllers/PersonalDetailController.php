@@ -78,6 +78,17 @@ class PersonalDetailController extends Controller
             'total' => $personalDetails->total(),
         ], 200);
     }
+
+    public function reference($reference)
+    
+    {
+        $personalDetail = PersonalDetail::where('application_reference', $reference)->first();
+        if ($personalDetail){
+            return response()->json(['message' => 'Student found', 'data'=>$personalDetail], 200);
+        } else{
+            return response()->json(['message' => 'Student not found', 'status'=>404], 404);
+        }
+    }
     
 
 
@@ -99,7 +110,7 @@ class PersonalDetailController extends Controller
     {
         $applicationNumber = $request->input('phoneNumber');
 
-        $personalDetail = PersonalDetail::with('educationalDetail')->where('phone_number', $applicationNumber)->first();
+        $personalDetail = PersonalDetail::with('educationalDetail','studentDetail')->where('phone_number', $applicationNumber)->first();
         if ($personalDetail){
             return response()->json(['message' => 'Student found', 'user'=>$personalDetail], 200);
         } else{
@@ -174,7 +185,7 @@ class PersonalDetailController extends Controller
 
         $applicationNumber = $request->input('application_number');
 
-        $personalDetail = PersonalDetail::where('application_number', $applicationNumber)->first();
+        $personalDetail = PersonalDetail::with('studentDetail')->where('application_number', $applicationNumber)->first();
         if ($personalDetail){
 
             if ($personalDetail->has_admission){
@@ -234,6 +245,7 @@ class PersonalDetailController extends Controller
             'course_paid' => 'nullable',
             'has_paid' => 'nullable',
             'email' => 'nullable',
+            'passport' => 'nullable|string',
             'course_fee_reference' => 'nullable',
             'couse_fee_date' => 'nullable',
             'gender' => 'nullable',
@@ -244,6 +256,8 @@ class PersonalDetailController extends Controller
             'scratchcard_upload' => 'nullable|string',
         ]);
     Log::info('Validated Data:', $validatedData);
+
+
     if($personalDetail->matric_number == null ){
 
         if( $validatedData['application_reference'] == null){
