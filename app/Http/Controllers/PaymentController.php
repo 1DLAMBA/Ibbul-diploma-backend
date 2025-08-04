@@ -115,7 +115,7 @@ class PaymentController extends Controller
                 }
 
                 break;
-            case 'acceptance_fees':
+            case 'ibbul_acceptance_fees':
                 // Handle successful charge
                 Log::info('Webhook Acceptance Fees HERE', [
                     'payload' => $request->all(),
